@@ -1,0 +1,7 @@
+.venv/
+venv/
+__pycache__/
+*.log
+onedrive_auth_shots/
+manifests/
+gh_publish/

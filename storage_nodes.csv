@@ -1,0 +1,11 @@
+Label,Provider,Type,Endpoint,Access Method,Auth Artifact,Status,Owner,Notes
+gcs_backup_primary,Google,Cloud Storage bucket,gs://backup-project-743aab84-f9a5-4ec7-954,rclone remote gcs,~/.config/gcloud/application_default_credentials.json,ACTIVE,amd949609@gmail.com,"Established backup bucket (holds bq_backup/ since 2026-06); uniform bucket-level access ON; US-CENTRAL1 STANDARD"
+gcs_osintneoxl,Google,Cloud Storage bucket,gs://osintneoxl,rclone remote gcs,same,ACTIVE,amd949609@gmail.com,Contains .antigravity-ide backups
+gcs_adc_default,Google,Cloud Storage bucket,gs://adc-d759a403-9030-45ab-9c81-cd5f822fe3bc,rclone remote gcs,same,ACTIVE,amd949609@gmail.com,Default ADC bucket
+gdrive_amd949609,Google,Google Drive,https://drive.google.com,rclone remote gdrive (not yet configured),needs one-time drive-scope OAuth consent,PENDING,amd949609@gmail.com,"ADC token lacks drive scope; Windows sync folder C:\Amd949609_Antigravity_v1\cloud_storage\gdrive_backup"
+onedrive_amd949609,Microsoft,OneDrive 1 TB,https://onedrive.live.com,rclone remote onedrive,~/.config/onedrive/credentials.json + rclone_token.json,SETUP IN PROGRESS,amd949609@gmail.com,Automated OAuth onboarding via tools/cloud_backup/onedrive_auth.py
+github_tonypost949_repo,GitHub,Git repository,https://github.com/Tonypost949/OsintNeoAi.git,gh CLI + git,GITHUB_PAT in ~/.env,ACTIVE,Tonypost949,Main repo (~1.8 GB); mirrored depth-50 by BFGH revolver
+github_tonypost949_laws,GitHub,Git repository,https://github.com/Tonypost949/ailaws,gh CLI + git,same,ACTIVE,Tonypost949,AI laws backup repo
+azure_devops_osintneoai,Microsoft,Git repository,https://dev.azure.com/anthonydimarcello/osintneoai/_git/osintneoai,git (creds missing),not provisioned on VM yet,QUEUED,anthonydimarcello,Backup remote per laws
+windows_user_folder,Local/Cloud-synced,User profile folder,C:\Amd949609_Antigravity_v1 (incl. cloud_storage\gdrive_backup + OneDrive sync),Windows machine,Windows-side,ACTIVE,amd949609,Keys mirror queued to C:\Amd949609_Antigravity_v1\Amd949609_keys\
+azure_vm_disk,Azure,Local disk,/home/osintneoai (D2as_v4 class VM),direct,local,ACTIVE,—,2 vCPU / 8 GiB; ~2.4 GB free; primary working set
