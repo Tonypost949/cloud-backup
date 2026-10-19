@@ -91,6 +91,14 @@ Evidence: `onedrive_auth_shots/` — per-step screenshots + HTML dumps for v1→
 rclone copy gcs:backup-project-743aab84-f9a5-4ec7-954/osintneoai_azure_vm/<machine>/<stamp>/<label> <destination> --progress
 ```
 
+## Troubleshooting
+
+- **`401 Invalid Credentials` on `gcs`** — the stored OAuth access token is stale while its stored expiry is in the future (rclone then skips auto-refresh). `cloud_backup.sh` now self-heals: it normalizes the token expiry to the past, which forces rclone to exchange the stored `refresh_token` for a fresh access token and persist a correct expiry. Manual equivalent:
+  ```bash
+  rclone lsd gcs: --max-depth 1     # after setting expiry to the past, this triggers + persists the refresh
+  ```
+- **rclone `config update` hangs** — pass `--non-interactive` (it can otherwise wait on stdin).
+
 ## Global use
 
 1. Copy `cloud_backup.sh` + `storage_nodes.csv` + this README to any machine.

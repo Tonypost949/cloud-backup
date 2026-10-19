@@ -23,6 +23,33 @@ TASKS="${TASKS_DIR:-$HOME/tools/task_system}"
 LEDGER="$TASKS/backup_ledger.jsonl"
 EXCL=(--exclude ".venv/**" --exclude "**/.venv/**" --exclude "venv/**" --exclude "**/__pycache__/**" --exclude "*.pyc")
 
+# --- GCS token self-heal (2026-10-19): a stale access token with a future
+# stored expiry blocks rclone's auto-refresh (401 Invalid Credentials).
+# Normalizing the expiry to the past forces rclone to refresh from the
+# stored refresh_token on the next call and persist a correct expiry.
+heal_gcs_token() {
+  python3 - "$RCLONE" <<'PY'
+import json, subprocess, sys
+R = sys.argv[1]
+dump = json.loads(subprocess.run([R, "config", "dump"], capture_output=True, text=True).stdout or "{}")
+if "gcs" not in dump:
+    sys.exit(0)
+t = json.loads(dump["gcs"].get("token", "{}"))
+t["expiry"] = "2000-01-01T00:00:00Z"
+subprocess.run([R, "config", "update", "gcs", "token", json.dumps(t), "--non-interactive"],
+               capture_output=True, text=True)
+PY
+}
+
+preflight() {
+  if ! "$RCLONE" lsd gcs: --max-depth 1 >/dev/null 2>&1; then
+    echo "WARN: gcs check failed — forcing token refresh" >&2
+    heal_gcs_token
+    "$RCLONE" lsd gcs: --max-depth 1 >/dev/null 2>&1 \
+      || echo "WARN: gcs still unreachable — this run may record partial" >&2
+  fi
+}
+
 targets() {
   echo "gcs:$GCS_BUCKET/$GCS_ROOT/$MACHINE"
   if "$RCLONE" listremotes 2>/dev/null | grep -qx "onedrive:"; then
@@ -87,6 +114,7 @@ push_one() {
 case "${1:-help}" in
   push)
     [ $# -eq 2 ] || { echo "usage: cloud_backup.sh push <set>"; exit 2; }
+    preflight
     while IFS='|' read -r label src; do push_one "$label" "$src"; done < <(entries "$2")
     ;;
   push-path)
